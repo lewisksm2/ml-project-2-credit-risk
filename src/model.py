@@ -2,8 +2,11 @@ from typing import Optional
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-
-
+from sklearn.metrics import (
+    accuracy_score,
+    roc_auc_score,
+    confusion_matrix
+)
 #---------------------------------------------------------------------------------
 # Model Constructors
 #---------------------------------------------------------------------------------
@@ -36,3 +39,37 @@ def get_random_forest_model(
         )
     
     return model
+
+#---------------------------------------------------------------------------------
+# Training
+#---------------------------------------------------------------------------------
+
+def train_model(model, X, y):
+    
+    model.fit(X,y)
+    
+    return model
+
+
+def evaluate_model(model, X, y):
+    
+    y_pred = model.predict(X)
+
+    if hasattr(model, "predict_proba"):
+        y_prob = model.predict_proba(X)[:,1]
+    else:
+        y_prob = None
+        
+    results = {}
+    
+    results["accuracy"] = accuracy_score(y,y_pred)
+    
+    if y_prob is not None:
+        results["roc_auc"] = roc_auc_score(y,y_prob)
+    else:
+        results["roc_auc"] = None
+        
+    results["confusion_matrix"] = confusion_matrix(y, y_pred)
+    
+    return results
+    
